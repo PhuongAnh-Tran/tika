@@ -25,3 +25,15 @@ tika-grpc/ignite
 # Python bytecode (e.g. from .skills scripts)
 __pycache__/
 *.pyc
+tika-core/pom.xml.bak
+.vscode/
+tika-core/chatunitests-tests-chat1.5/
+tika-core/chatunitests-tests1.5f/
+tika-core/chatunitests/
+docs/
+tika-core/target/
+baseline/
+hs_err_pid4152.log
+hs_err_pid21672.log
+resultats-codeqwen/
+jacoco-final.log
