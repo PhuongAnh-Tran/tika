@@ -36,3 +36,4 @@ baseline/
 hs_err_pid4152.log
 hs_err_pid21672.log
 resultats-codeqwen/
+jacoco-final.log
