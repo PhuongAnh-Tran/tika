@@ -150,7 +150,7 @@ jobs:
             REVISION=${{ steps.meta.outputs.sha }}
             CREATED=${{ steps.meta.outputs.created }}
           tags: |
-            apache/tika:${{ steps.version.outputs.tika_version }}
+            ${{ secrets.DOCKER_USERNAME }}/tika:${{ steps.version.outputs.tika_version }}
 
       # --- tika-server (full) ---
       - name: Prepare tika-server full build context
@@ -206,7 +206,7 @@ jobs:
             REVISION=${{ steps.meta.outputs.sha }}
             CREATED=${{ steps.meta.outputs.created }}
           tags: |
-            apache/tika:${{ steps.version.outputs.tika_version }}-full
+            ${{ secrets.DOCKER_USERNAME }}/tika:${{ steps.version.outputs.tika_version }}-full
 
       # --- tika-grpc ---
       - name: Prepare tika-grpc Docker build context
@@ -293,4 +293,4 @@ jobs:
             REVISION=${{ steps.meta.outputs.sha }}
             CREATED=${{ steps.meta.outputs.created }}
           tags: |
-            apache/tika-grpc:${{ steps.version.outputs.tika_version }}
+            ${{ secrets.DOCKER_USERNAME }}/tika-grpc:${{ steps.version.outputs.tika_version }}
