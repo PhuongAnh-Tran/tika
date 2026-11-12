@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tika.config.JsonConfig;
 
-// Tests écrits manuellement pour les mutants non détectés par les tests originaux ni par les tests générés
+// Tests écrits manuellement pour les mutants non détectés par les tests originaux ni par les tests généres
 public class ParseContextManuelTest {
 
     // Vérifie que setResolvedConfig réutilise la même map et n'écrase pas les entrées existantes
