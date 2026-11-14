@@ -26,11 +26,13 @@ on:
     branches: [ main ]
     paths-ignore:
       - 'docs/**'
-env:
-  SEMGREP_DEPART: 18e58e86b910e4d878730af329a559b60308b99d
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SEMGREP_APP_TOKEN: ${{secrets.SEMGREP_APP_TOKEN}} 
+      SEMGREP_DEPART: 18e58e86b910e4d878730af329a559b60308b99d ##commit baseline qu'on utilise pour comparer
     timeout-minutes: 60
     strategy:
       matrix:
@@ -45,8 +47,11 @@ jobs:
           python-version: "3.13.5"
       
       - name: Install Semgrep
-        run: pip install semgrep==1.185.0
-      
+        run: pip install --upgrade pip && pip install semgrep==1.185.0
+        
+      - name: Login Semgrep
+        run: semgrep login
+        
       - name: Run Semgrep with java pack
         run: semgrep scan --config p/java --metrics off --baseline-commit ${{env.SEMGREP_DEPART}} --error
 
