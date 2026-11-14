@@ -35,10 +35,31 @@ jobs:
       matrix:
         java: [ '17' ]
 
+    env:
+      SEMGREP_APP_TOKEN: ${{secrets.SEMGREP_APP_TOKEN}} 
+      SEMGREP_DEPART: 18e58e86b910e4d878730af329a559b60308b99d ##commit baseline qu'on utilise pour comparer
+
     steps:
+      
       - uses: actions/checkout@v6
         with:
           path: 'tika build dir'
+          fetch-depth: 0
+      
+      - uses: actions/setup-python@v7 ##ajouter une version python a notre workflow
+        with:
+          python-version: "3.13.5"
+      
+      - name: Install Semgrep
+        run: python -m pip install semgrep==1.185.0
+        
+      - name: Login Semgrep ##se connecter pour avoir tout le package java
+        run: semgrep login
+        
+      - name: Run Semgrep with java pack ## lancer et comparer avec la baseline fail si trouve une difference
+        run: semgrep scan --config p/java --metrics off --baseline-commit ${{env.SEMGREP_DEPART}} --error
+
+
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v5
         with:
