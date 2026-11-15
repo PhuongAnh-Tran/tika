@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 package org.apache.tika.utils;
-// validation 2 modification fichier avec finding
+
 
 import java.io.IOException;
 import java.io.PrintWriter;
