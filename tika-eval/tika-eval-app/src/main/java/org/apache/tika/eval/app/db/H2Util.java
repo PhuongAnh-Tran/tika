@@ -89,4 +89,17 @@ public class H2Util extends JDBCUtil {
         }
         return tables;
     }
+
+    /**
+     * IFT3913 isolated demonstration: SQL built by string concatenation.
+     * Not used by Tika's normal database helper methods.
+     */
+    public static boolean ift3913DemoUnsafeSql(Connection connection, String tableName)
+            throws SQLException {
+        String sql = "SELECT * FROM " + tableName;
+        try (Statement statement = connection.createStatement()) {
+            return statement.execute(sql);
+        }
+    }
+
 }

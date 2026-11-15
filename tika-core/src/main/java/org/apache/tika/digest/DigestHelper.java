@@ -18,8 +18,16 @@ package org.apache.tika.digest;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 import org.apache.tika.extractor.DefaultEmbeddedStreamTranslator;
 import org.apache.tika.extractor.EmbeddedStreamTranslator;
@@ -47,6 +55,19 @@ public class DigestHelper {
 
     private static final EmbeddedStreamTranslator EMBEDDED_STREAM_TRANSLATOR =
             new DefaultEmbeddedStreamTranslator();
+
+    /**
+     * Marker for the isolated IFT3913 weak-digest demonstration.
+     * Must not be enabled in production.
+     */
+    public static final class WeakDigestDemonstration {
+
+        private WeakDigestDemonstration() {
+        }
+
+        public static final WeakDigestDemonstration ENABLED =
+                new WeakDigestDemonstration();
+    }
 
     /**
      * Computes digests on the stream if a DigesterFactory is configured in ParseContext.
@@ -80,6 +101,28 @@ public class DigestHelper {
 
         Digester digester = digesterFactory.build();
 
+        // IFT3913: opt-in demonstration of weak document hashing.
+        if (context.get(WeakDigestDemonstration.class) != null) {
+            tis.enableRewind();
+            try {
+                MessageDigest weakDigest = MessageDigest.getInstance("MD5");
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+
+                while ((bytesRead = tis.read(buffer)) != -1) {
+                    weakDigest.update(buffer, 0, bytesRead);
+                }
+
+                metadata.set("X-IFT3913-Demo-MD5",
+                        HexFormat.of().formatHex(weakDigest.digest()));
+            } catch (NoSuchAlgorithmException e) {
+                throw new IOException(
+                        "Unable to compute demonstration digest", e);
+            } finally {
+                tis.rewind();
+            }
+        }
+
         // Handle embedded stream translation if needed (e.g., for OLE2 objects in TikaInputStream's
         // open container). The translator consumes `tis` to produce the translated bytes that get
         // digested, so we enableRewind() before and rewind() after — otherwise the caller (typically
@@ -101,4 +144,29 @@ public class DigestHelper {
             digester.digest(tis, metadata, context);
         }
     }
+
+    /**
+     * IFT3913 isolated demonstration: ECB leaks repeated plaintext patterns.
+     * Not called by Tika's normal parsing flow.
+     */
+    public static byte[] ift3913DemoEcb(byte[] data, SecretKey key)
+            throws GeneralSecurityException {
+        Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * IFT3913 isolated demonstration: fixed GCM nonce reuse.
+     * Not called by Tika's normal parsing flow.
+     */
+    public static byte[] ift3913DemoGcm(byte[] data, SecretKey key)
+            throws GeneralSecurityException {
+        byte[] nonce = "fixednonce12".getBytes(StandardCharsets.UTF_8);
+        GCMParameterSpec parameters = new GCMParameterSpec(128, nonce);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, parameters);
+        return cipher.doFinal(data);
+    }
+
 }

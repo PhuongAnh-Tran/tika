@@ -1303,4 +1303,15 @@ public class XMLReaderUtils implements Serializable {
 
         return XMLReaderUtils.getTransformer();
     }
+
+    /**
+     * IFT3913 isolated demonstration: XXE protections are not configured.
+     * Not called by Tika's protected XML parsing methods.
+     */
+    public static DocumentBuilder ift3913DemoUnsafeXml()
+            throws ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        return factory.newDocumentBuilder();
+    }
+
 }

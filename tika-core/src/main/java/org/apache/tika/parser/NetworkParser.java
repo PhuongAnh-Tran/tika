@@ -24,8 +24,10 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Set;
+import javax.net.ssl.SSLContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
@@ -165,6 +167,25 @@ public class NetworkParser implements Parser {
             }
         }
 
+    }
+
+
+    /**
+     * IFT3913 isolated demonstration: plain TCP does not encrypt traffic.
+     * Not called by Tika's network parsing flow.
+     */
+    public static Socket ift3913DemoPlainSocket(String host, int port)
+            throws IOException {
+        return new Socket(host, port);
+    }
+
+    /**
+     * IFT3913 isolated demonstration: obsolete TLS 1.0 configuration.
+     * Not called by Tika's network parsing flow.
+     */
+    public static SSLContext ift3913DemoWeakTls()
+            throws NoSuchAlgorithmException {
+        return SSLContext.getInstance("TLSv1");
     }
 
 }
