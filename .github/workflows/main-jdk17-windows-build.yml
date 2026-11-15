@@ -40,7 +40,7 @@ jobs:
       SEMGREP_DEPART: 18e58e86b910e4d878730af329a559b60308b99d ##commit baseline qu'on utilise pour comparer
 
     steps:
-      
+
       - uses: actions/checkout@v6
         with:
           path: 'tika build dir'
@@ -57,6 +57,7 @@ jobs:
         run: semgrep login
         
       - name: Run Semgrep with java pack ## lancer et comparer avec la baseline fail si trouve une difference
+        working-directory: 'tika build dir'
         run: semgrep scan --config p/java --metrics off --baseline-commit ${{env.SEMGREP_DEPART}} --error
 
 
